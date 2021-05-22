@@ -13,6 +13,7 @@
 		244E35C82658912E00327517 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 244E35C62658912E00327517 /* Main.storyboard */; };
 		244E35CA2658913000327517 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 244E35C92658913000327517 /* Assets.xcassets */; };
 		244E35CD2658913000327517 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 244E35CB2658913000327517 /* LaunchScreen.storyboard */; };
+		244E35D52658948500327517 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 244E35D42658948500327517 /* www */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		244E35C92658913000327517 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		244E35CC2658913000327517 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		244E35CE2658913000327517 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		244E35D42658948500327517 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; path = www; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,6 +42,7 @@
 		244E35B42658912E00327517 = {
 			isa = PBXGroup;
 			children = (
+				244E35D42658948500327517 /* www */,
 				244E35BF2658912E00327517 /* RuffleMobile */,
 				244E35BE2658912E00327517 /* Products */,
 			);
@@ -124,6 +127,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				244E35D52658948500327517 /* www in Resources */,
 				244E35CD2658913000327517 /* LaunchScreen.storyboard in Resources */,
 				244E35CA2658913000327517 /* Assets.xcassets in Resources */,
 				244E35C82658912E00327517 /* Main.storyboard in Resources */,

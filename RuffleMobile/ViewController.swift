@@ -15,10 +15,10 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let myUrl = URL(string: "https://www.google.com")
-        let myRequest = URLRequest(url: myUrl!)
+        let localUrl = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "www")!
+        webView.loadFileURL(localUrl, allowingReadAccessTo: localUrl)
+        let myRequest = URLRequest(url: localUrl)
         webView.load(myRequest)
     }
     
 }
-
