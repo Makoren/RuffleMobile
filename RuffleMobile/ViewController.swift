@@ -9,24 +9,29 @@ import UIKit
 import WebKit
 import GCDWebServer
 
-class ViewController: UIViewController, WKNavigationDelegate {
+class ViewController: UIViewController {
 
     @IBOutlet weak var webView: WKWebView!
     
     var webServer: GCDWebServer!
+    let PORT: UInt = 8080
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        webView.navigationDelegate = self
         
         webServer = GCDWebServer()
         let webContentPath = Bundle.main.path(forResource: "www", ofType: nil)!
 
         webServer.addGETHandler(forBasePath: "/", directoryPath: webContentPath, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
-        webServer.start(withPort: 8080, bonjourName: "")
+        webServer.start(withPort: PORT, bonjourName: "")
         
-        let request = URLRequest(url: URL(string: "http://localhost:8080")!)
+        let request = URLRequest(url: URL(string: "http://localhost:\(PORT)")!)
         webView.load(request)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        webServer.stop()
     }
     
 }
