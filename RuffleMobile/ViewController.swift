@@ -13,31 +13,36 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
 
     @IBOutlet weak var webView: WKWebView!
     
-    var webServer: GCDWebServer!
-    let PORT: UInt = 8080
+    var httpServer: GCDWebServer!
+    var webDAVServer: GCDWebDAVServer!
+    let HTTP_PORT: UInt = 80
+    let WEBDAV_PORT: UInt = 8080
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        webServer = GCDWebServer()
         let webContentUrl = Bundle.main.path(forResource: "www", ofType: nil)!
 
-        webServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
-        webServer.start(withPort: PORT, bonjourName: "")
+        httpServer = GCDWebServer()
+        webDAVServer = GCDWebDAVServer(uploadDirectory: webContentUrl)
         
-        let request = URLRequest(url: URL(string: "http://localhost:\(PORT)")!)
+        httpServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
+        httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
+        webDAVServer.start(withPort: WEBDAV_PORT, bonjourName: nil)
+        
+        let request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)")!)
         webView.load(request)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        webServer.stop()
+        httpServer.stop()
+        webDAVServer.stop()
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         print("Picked documents at \(urls) from \(controller)")
         let importedFileUrl = urls.first!   // safe to force unwrap, VC doesn't allow multiple selection
-        
     }
     
     @IBAction func importButtonPressed(_ sender: Any) {
