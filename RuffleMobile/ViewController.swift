@@ -8,12 +8,6 @@
 import UIKit
 import WebKit
 import GCDWebServer
-import WebDAV
-
-struct BasicAccount: WebDAVAccount {
-    var username: String?
-    var baseURL: String?
-}
 
 class ViewController: UIViewController, UIDocumentPickerDelegate {
 
@@ -21,8 +15,6 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     
     var httpServer: GCDWebServer!
     var webDAVServer: GCDWebDAVServer!
-    var webDAVClient: WebDAV!
-    var webDAVAccount: BasicAccount!
     
     var webDAVURL: String = ""
     
@@ -38,8 +30,6 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         
         webDAVURL = "http://localhost:\(WEBDAV_PORT)/"
         webDAVServer = GCDWebDAVServer(uploadDirectory: webContentUrl)
-        webDAVClient = WebDAV()
-        webDAVAccount = BasicAccount(username: "", baseURL: webDAVURL)
         
         httpServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
         httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
@@ -49,23 +39,23 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         webView.load(request)
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        httpServer.stop()
-        webDAVServer.stop()
-    }
-    
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         print("Picked documents at \(urls) from \(controller)")
         let importedFileUrl = urls.first!   // safe to force unwrap, VC doesn't allow multiple selection
         
         do {
             let data = try Data(contentsOf: importedFileUrl)
-            webDAVClient.upload(data: data, toPath: "ball.png", account: webDAVAccount, password: "") { error in
-                DispatchQueue.main.async {
-                    self.createErrorAlert(message: error.debugDescription)
-                }
+            
+            let request = URLRequest(url: URL(string: "http://localhost:\(WEBDAV_PORT)/ball.png")!, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: TimeInterval(10))
+            
+            let task = URLSession(configuration: URLSessionConfiguration.ephemeral).uploadTask(with: request, from: data) { data, response, error in
+                print("Data: \(String(describing: data))")
+                print("Response: \(String(describing: response))")
+                print("Error: \(String(describing: error))")
             }
+            
+            task.resume()
+            
         } catch let error {
             createErrorAlert(message: error.localizedDescription)
         }

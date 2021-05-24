@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,7 +14,6 @@
 		244E35CA2658913000327517 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 244E35C92658913000327517 /* Assets.xcassets */; };
 		244E35CD2658913000327517 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 244E35CB2658913000327517 /* LaunchScreen.storyboard */; };
 		244E35D52658948500327517 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 244E35D42658948500327517 /* www */; };
-		24FE7134265B51660034A7F6 /* WebDAV in Frameworks */ = {isa = PBXBuildFile; productRef = 24FE7133265B51660034A7F6 /* WebDAV */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,7 +36,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2248E3F5C7816DDE8210AFD9 /* Pods_RuffleMobile.framework in Frameworks */,
-				24FE7134265B51660034A7F6 /* WebDAV in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,7 +110,6 @@
 			);
 			name = RuffleMobile;
 			packageProductDependencies = (
-				24FE7133265B51660034A7F6 /* WebDAV */,
 			);
 			productName = RuffleMobile;
 			productReference = 244E35BD2658912E00327517 /* RuffleMobile.app */;
@@ -142,7 +139,6 @@
 			);
 			mainGroup = 244E35B42658912E00327517;
 			packageReferences = (
-				24FE7132265B51660034A7F6 /* XCRemoteSwiftPackageReference "WebDAV-Swift" */,
 			);
 			productRefGroup = 244E35BE2658912E00327517 /* Products */;
 			projectDirPath = "";
@@ -421,25 +417,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		24FE7132265B51660034A7F6 /* XCRemoteSwiftPackageReference "WebDAV-Swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Isvvc/WebDAV-Swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.1.3;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		24FE7133265B51660034A7F6 /* WebDAV */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 24FE7132265B51660034A7F6 /* XCRemoteSwiftPackageReference "WebDAV-Swift" */;
-			productName = WebDAV;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 244E35B52658912E00327517 /* Project object */;
 }
