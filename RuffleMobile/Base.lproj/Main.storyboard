@@ -2,9 +2,9 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -24,14 +24,25 @@
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ind-u3-tZJ">
+                                <rect key="frame" x="339" y="779" width="50" height="58"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="gg4-R3-9rU"/>
+                                    <constraint firstAttribute="height" constant="58" id="jWQ-Ae-kEJ"/>
+                                </constraints>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" image="square.and.arrow.down.fill" catalog="system"/>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="Yry-OT-KAD" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="LMy-ng-gZV"/>
-                            <constraint firstItem="Yry-OT-KAD" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="grp-qM-CuF"/>
-                            <constraint firstItem="Yry-OT-KAD" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="oqJ-Bo-f08"/>
-                            <constraint firstItem="Yry-OT-KAD" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="uHD-b2-O0b"/>
+                            <constraint firstItem="Yry-OT-KAD" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="4jd-JB-bod"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="ind-u3-tZJ" secondAttribute="bottom" constant="25" id="DfN-26-71O"/>
+                            <constraint firstItem="Yry-OT-KAD" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="ENd-tW-eFZ"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="ind-u3-tZJ" secondAttribute="trailing" constant="25" id="al7-Lq-roG"/>
+                            <constraint firstItem="Yry-OT-KAD" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="ev2-FL-U1V"/>
+                            <constraint firstItem="Yry-OT-KAD" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="lIo-jl-g51"/>
                         </constraints>
                     </view>
                     <connections>
@@ -44,8 +55,6 @@
         </scene>
     </scenes>
     <resources>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
+        <image name="square.and.arrow.down.fill" catalog="system" width="121" height="128"/>
     </resources>
 </document>

@@ -9,7 +9,7 @@ import UIKit
 import WebKit
 import GCDWebServer
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIDocumentPickerDelegate {
 
     @IBOutlet weak var webView: WKWebView!
     
@@ -18,6 +18,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let dpvc = UIDocumentPickerViewController(documentTypes: ["public.png"], in: .import)
         
         webServer = GCDWebServer()
         let webContentPath = Bundle.main.path(forResource: "www", ofType: nil)!
@@ -34,4 +35,7 @@ class ViewController: UIViewController {
         webServer.stop()
     }
     
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        print("Picked documents at \(urls) from \(controller)")
+    }
 }
