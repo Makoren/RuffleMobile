@@ -24,23 +24,22 @@
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ind-u3-tZJ">
-                                <rect key="frame" x="339" y="779" width="50" height="58"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="50" id="gg4-R3-9rU"/>
-                                    <constraint firstAttribute="height" constant="58" id="jWQ-Ae-kEJ"/>
-                                </constraints>
-                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <state key="normal" image="square.and.arrow.down.fill" catalog="system"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sXx-Lo-GGG">
+                                <rect key="frame" x="336" y="806" width="58" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Import">
+                                    <color key="titleColor" white="0.90190668706293708" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="Yry-OT-KAD" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="4jd-JB-bod"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="ind-u3-tZJ" secondAttribute="bottom" constant="25" id="DfN-26-71O"/>
                             <constraint firstItem="Yry-OT-KAD" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="ENd-tW-eFZ"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="ind-u3-tZJ" secondAttribute="trailing" constant="25" id="al7-Lq-roG"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="sXx-Lo-GGG" secondAttribute="trailing" constant="20" id="Mcj-5a-be7"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="sXx-Lo-GGG" secondAttribute="bottom" constant="20" id="OhW-Qw-hhN"/>
+                            <constraint firstItem="sXx-Lo-GGG" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="leading" symbolic="YES" id="Q17-3X-E0c"/>
                             <constraint firstItem="Yry-OT-KAD" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="ev2-FL-U1V"/>
                             <constraint firstItem="Yry-OT-KAD" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="lIo-jl-g51"/>
                         </constraints>
@@ -54,7 +53,4 @@
             <point key="canvasLocation" x="131.8840579710145" y="114.50892857142857"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="square.and.arrow.down.fill" catalog="system" width="121" height="128"/>
-    </resources>
 </document>
