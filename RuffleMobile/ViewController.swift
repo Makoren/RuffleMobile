@@ -18,12 +18,11 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let dpvc = UIDocumentPickerViewController(documentTypes: ["public.png"], in: .import)
         
         webServer = GCDWebServer()
-        let webContentPath = Bundle.main.path(forResource: "www", ofType: nil)!
+        let webContentUrl = Bundle.main.path(forResource: "www", ofType: nil)!
 
-        webServer.addGETHandler(forBasePath: "/", directoryPath: webContentPath, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
+        webServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
         webServer.start(withPort: PORT, bonjourName: "")
         
         let request = URLRequest(url: URL(string: "http://localhost:\(PORT)")!)
@@ -37,5 +36,14 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         print("Picked documents at \(urls) from \(controller)")
+        let importedFileUrl = urls.first!   // safe to force unwrap, VC doesn't allow multiple selection
+        
+    }
+    
+    @IBAction func importButtonPressed(_ sender: Any) {
+        let dpvc = UIDocumentPickerViewController(documentTypes: ["public.image"], in: .import)
+        dpvc.delegate = self
+        dpvc.allowsMultipleSelection = false
+        present(dpvc, animated: true, completion: nil)
     }
 }

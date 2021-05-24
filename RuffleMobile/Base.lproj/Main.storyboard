@@ -30,6 +30,9 @@
                                 <state key="normal" title="Import">
                                     <color key="titleColor" white="0.90190668706293708" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
+                                <connections>
+                                    <action selector="importButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="QUX-3L-KCv"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
