@@ -8,6 +8,12 @@
 import UIKit
 import WebKit
 import GCDWebServer
+import WebDAV
+
+struct BasicAccount: WebDAVAccount {
+    var username: String?
+    var baseURL: String?
+}
 
 class ViewController: UIViewController, UIDocumentPickerDelegate {
 
@@ -15,6 +21,11 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     
     var httpServer: GCDWebServer!
     var webDAVServer: GCDWebDAVServer!
+    var webDAVClient: WebDAV!
+    var webDAVAccount: BasicAccount!
+    
+    var webDAVURL: String = ""
+    
     let HTTP_PORT: UInt = 80
     let WEBDAV_PORT: UInt = 8080
     
@@ -24,13 +35,17 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         let webContentUrl = Bundle.main.path(forResource: "www", ofType: nil)!
 
         httpServer = GCDWebServer()
+        
+        webDAVURL = "http://localhost:\(WEBDAV_PORT)/"
         webDAVServer = GCDWebDAVServer(uploadDirectory: webContentUrl)
+        webDAVClient = WebDAV()
+        webDAVAccount = BasicAccount(username: "", baseURL: webDAVURL)
         
         httpServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
         httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
         webDAVServer.start(withPort: WEBDAV_PORT, bonjourName: nil)
         
-        let request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)")!)
+        let request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/")!)
         webView.load(request)
     }
     
@@ -43,6 +58,17 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         print("Picked documents at \(urls) from \(controller)")
         let importedFileUrl = urls.first!   // safe to force unwrap, VC doesn't allow multiple selection
+        
+        do {
+            let data = try Data(contentsOf: importedFileUrl)
+            webDAVClient.upload(data: data, toPath: "ball.png", account: webDAVAccount, password: "") { error in
+                DispatchQueue.main.async {
+                    self.createErrorAlert(message: error.debugDescription)
+                }
+            }
+        } catch let error {
+            createErrorAlert(message: error.localizedDescription)
+        }
     }
     
     @IBAction func importButtonPressed(_ sender: Any) {
@@ -50,5 +76,11 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         dpvc.delegate = self
         dpvc.allowsMultipleSelection = false
         present(dpvc, animated: true, completion: nil)
+    }
+    
+    func createErrorAlert(message: String) {
+        let ac = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(ac, animated: true, completion: nil)
     }
 }
