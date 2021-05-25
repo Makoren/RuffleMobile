@@ -25,6 +25,7 @@
 #import "GCDWebServerFileResponse.h"
 #import "GCDWebServerStreamedResponse.h"
 #import "GCDWebDAVServer.h"
+#import "GCDWebUploader.h"
 
 FOUNDATION_EXPORT double GCDWebServerVersionNumber;
 FOUNDATION_EXPORT const unsigned char GCDWebServerVersionString[];

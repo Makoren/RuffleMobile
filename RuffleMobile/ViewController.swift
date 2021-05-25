@@ -14,12 +14,13 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     @IBOutlet weak var webView: WKWebView!
     
     var httpServer: GCDWebServer!
-    var webDAVServer: GCDWebDAVServer!
+    //var webDAVServer: GCDWebDAVServer!
+    //var webUploader: GCDWebUploader!
     
-    var webDAVURL: String = ""
+    //var webDAVURL: String = ""
     
     let HTTP_PORT: UInt = 80
-    let WEBDAV_PORT: UInt = 8080
+    //let WEBDAV_PORT: UInt = 8080
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,23 +29,27 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
 
         httpServer = GCDWebServer()
         
-        webDAVURL = "http://localhost:\(WEBDAV_PORT)/"
-        webDAVServer = GCDWebDAVServer(uploadDirectory: webContentUrl)
+        //webDAVURL = "http://localhost:\(WEBDAV_PORT)/"
+        //webDAVServer = GCDWebDAVServer(uploadDirectory: webContentUrl)
         
         httpServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
         httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
+        httpServer.addDefaultHandler(forMethod: "PUT", request: GCDWebServerRequest.self) { request in
+            return GCDWebServerResponse(statusCode: 200)
+        }
+        
         //webDAVServer.start(withPort: WEBDAV_PORT, bonjourName: "rufflemobile-dav")
         
-        let options: [String: Any] = [
-            GCDWebServerOption_Port: WEBDAV_PORT,
-            //GCDWebServerOption_BindToLocalhost: true
-        ]
-        
-        do {
-            try webDAVServer.start(options: options)
-        } catch let error {
-            print("Could not start WebDAV server. Reason: \(error.localizedDescription)")
-        }
+//        let options: [String: Any] = [
+//            GCDWebServerOption_Port: WEBDAV_PORT,
+//            //GCDWebServerOption_BindToLocalhost: true
+//        ]
+//
+//        do {
+//            try webDAVServer.start(options: options)
+//        } catch let error {
+//            print("Could not start WebDAV server. Reason: \(error.localizedDescription)")
+//        }
         
         let request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/")!)
         webView.load(request)
@@ -56,19 +61,19 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         
         do {
             let data = try Data(contentsOf: importedFileUrl)
-            
-            var request = URLRequest(url: URL(string: "http://localhost:\(WEBDAV_PORT)/pixel.png")!)
+
+            var request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/pixel.png")!)
             request.httpMethod = "PUT"
-            
+
             let task = URLSession(configuration: .ephemeral).uploadTask(with: request, from: data) { data, response, error in
                 print("Data: \(String(describing: data))")
                 print("Response: \(String(describing: response))")
                 print("Error: \(String(describing: error))")
                 print(String(decoding: data!, as: UTF8.self))
             }
-            
+
             task.resume()
-            
+
         } catch let error {
             createErrorAlert(message: error.localizedDescription)
         }
