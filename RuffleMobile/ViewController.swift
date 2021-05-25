@@ -15,12 +15,12 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     
     var httpServer: GCDWebServer!
     //var webDAVServer: GCDWebDAVServer!
-    //var webUploader: GCDWebUploader!
+    var webUploader: GCDWebUploader!
     
     //var webDAVURL: String = ""
     
     let HTTP_PORT: UInt = 80
-    //let WEBDAV_PORT: UInt = 8080
+    let UPLOADER_PORT: UInt = 8080
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,15 +28,19 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         let webContentUrl = Bundle.main.path(forResource: "www", ofType: nil)!
 
         httpServer = GCDWebServer()
+        webUploader = GCDWebUploader(uploadDirectory: webContentUrl)
         
         //webDAVURL = "http://localhost:\(WEBDAV_PORT)/"
         //webDAVServer = GCDWebDAVServer(uploadDirectory: webContentUrl)
         
         httpServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
-        httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
-        httpServer.addDefaultHandler(forMethod: "PUT", request: GCDWebServerRequest.self) { request in
-            return GCDWebServerResponse(statusCode: 200)
+        httpServer.addDefaultHandler(forMethod: "PUT", request: GCDWebServerRequest.self) { request, block in
+            print(request)
+            //return GCDWebServerResponse(statusCode: 200)
         }
+        httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
+        
+        webUploader.start(withPort: UPLOADER_PORT, bonjourName: nil)
         
         //webDAVServer.start(withPort: WEBDAV_PORT, bonjourName: "rufflemobile-dav")
         
