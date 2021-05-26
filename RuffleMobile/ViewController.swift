@@ -14,13 +14,13 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     @IBOutlet weak var webView: WKWebView!
     
     var httpServer: GCDWebServer!
-    //var webDAVServer: GCDWebDAVServer!
-    var webUploader: GCDWebUploader!
+    var webDAVServer: GCDWebDAVServer!
+    //var webUploader: GCDWebUploader!
     
-    //var webDAVURL: String = ""
+    var webDAVURL: String = ""
     
     let HTTP_PORT: UInt = 80
-    let UPLOADER_PORT: UInt = 8080
+    let WEBDAV_PORT: UInt = 8080
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,32 +28,33 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         let webContentUrl = Bundle.main.path(forResource: "www", ofType: nil)!
 
         httpServer = GCDWebServer()
-        webUploader = GCDWebUploader(uploadDirectory: webContentUrl)
+        //webUploader = GCDWebUploader(uploadDirectory: webContentUrl)
         
-        //webDAVURL = "http://localhost:\(WEBDAV_PORT)/"
-        //webDAVServer = GCDWebDAVServer(uploadDirectory: webContentUrl)
+        webDAVURL = "http://localhost:\(WEBDAV_PORT)/"
+        webDAVServer = GCDWebDAVServer(uploadDirectory: webContentUrl)
         
         httpServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
-        httpServer.addDefaultHandler(forMethod: "PUT", request: GCDWebServerRequest.self) { request, block in
-            print(request)
-            //return GCDWebServerResponse(statusCode: 200)
-        }
+//        httpServer.addDefaultHandler(forMethod: "POST", request: GCDWebServerDataRequest.self) { request in
+//            print(request.contentLength)
+//            print(request.path)
+//            return GCDWebServerDataResponse(html: "Text in a response.")
+//        }
         httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
         
-        webUploader.start(withPort: UPLOADER_PORT, bonjourName: nil)
+        //webUploader.start(withPort: UPLOADER_PORT, bonjourName: nil)
         
-        //webDAVServer.start(withPort: WEBDAV_PORT, bonjourName: "rufflemobile-dav")
+        //webDAVServer.start(withPort: WEBDAV_PORT, bonjourName: nil)
         
-//        let options: [String: Any] = [
-//            GCDWebServerOption_Port: WEBDAV_PORT,
-//            //GCDWebServerOption_BindToLocalhost: true
-//        ]
-//
-//        do {
-//            try webDAVServer.start(options: options)
-//        } catch let error {
-//            print("Could not start WebDAV server. Reason: \(error.localizedDescription)")
-//        }
+        let options: [String: Any] = [
+            GCDWebServerOption_Port: WEBDAV_PORT,
+            //GCDWebServerOption_BindToLocalhost: true
+        ]
+
+        do {
+            try webDAVServer.start(options: options)
+        } catch let error {
+            print("Could not start WebDAV server. Reason: \(error.localizedDescription)")
+        }
         
         let request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/")!)
         webView.load(request)
@@ -66,7 +67,7 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         do {
             let data = try Data(contentsOf: importedFileUrl)
 
-            var request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/pixel.png")!)
+            var request = URLRequest(url: URL(string: "http://localhost:\(WEBDAV_PORT)/arbitrary.txt")!)
             request.httpMethod = "PUT"
 
             let task = URLSession(configuration: .ephemeral).uploadTask(with: request, from: data) { data, response, error in
@@ -84,7 +85,7 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     }
     
     @IBAction func importButtonPressed(_ sender: Any) {
-        let dpvc = UIDocumentPickerViewController(documentTypes: ["public.image"], in: .import)
+        let dpvc = UIDocumentPickerViewController(documentTypes: ["public.text"], in: .import)
         dpvc.delegate = self
         dpvc.allowsMultipleSelection = false
         present(dpvc, animated: true, completion: nil)
