@@ -14,13 +14,7 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     @IBOutlet weak var webView: WKWebView!
     
     var httpServer: GCDWebServer!
-    var webDAVServer: GCDWebDAVServer!
-    //var webUploader: GCDWebUploader!
-    
-    var webDAVURL: String = ""
-    
     let HTTP_PORT: UInt = 80
-    let WEBDAV_PORT: UInt = 8080
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,33 +22,36 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         let webContentUrl = Bundle.main.path(forResource: "www", ofType: nil)!
 
         httpServer = GCDWebServer()
-        //webUploader = GCDWebUploader(uploadDirectory: webContentUrl)
-        
-        webDAVURL = "http://localhost:\(WEBDAV_PORT)/"
-        webDAVServer = GCDWebDAVServer(uploadDirectory: webContentUrl)
         
         httpServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
-//        httpServer.addDefaultHandler(forMethod: "POST", request: GCDWebServerDataRequest.self) { request in
-//            print(request.contentLength)
-//            print(request.path)
-//            return GCDWebServerDataResponse(html: "Text in a response.")
-//        }
-        httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
         
-        //webUploader.start(withPort: UPLOADER_PORT, bonjourName: nil)
-        
-        //webDAVServer.start(withPort: WEBDAV_PORT, bonjourName: nil)
-        
-        let options: [String: Any] = [
-            GCDWebServerOption_Port: WEBDAV_PORT,
-            //GCDWebServerOption_BindToLocalhost: true
-        ]
-
-        do {
-            try webDAVServer.start(options: options)
-        } catch let error {
-            print("Could not start WebDAV server. Reason: \(error.localizedDescription)")
+        httpServer.addDefaultHandler(forMethod: "POST", request: GCDWebServerDataRequest.self) { request in
+            // get body of request somehow and store data in "www" directory
+            let dataRequest = request as! GCDWebServerDataRequest
+            print("Request received: \(String(decoding: dataRequest.data, as: UTF8.self))")
+            
+            // create file for request data
+            var documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            documentsPath.appendPathComponent("arbitrary.txt")
+            
+            do {
+                try dataRequest.data.write(to: documentsPath)
+                print(documentsPath)
+            } catch let error {
+                print(error.localizedDescription)
+            }
+            
+            let items = try! FileManager.default.contentsOfDirectory(atPath: webContentUrl)
+            for item in items {
+                print(item)
+            }
+            
+            // attempt to request data from server
+            
+            return GCDWebServerResponse(statusCode: 200)
         }
+        
+        httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
         
         let request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/")!)
         webView.load(request)
@@ -67,8 +64,8 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         do {
             let data = try Data(contentsOf: importedFileUrl)
 
-            var request = URLRequest(url: URL(string: "http://localhost:\(WEBDAV_PORT)/arbitrary.txt")!)
-            request.httpMethod = "PUT"
+            var request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/")!)
+            request.httpMethod = "POST"
 
             let task = URLSession(configuration: .ephemeral).uploadTask(with: request, from: data) { data, response, error in
                 print("Data: \(String(describing: data))")
