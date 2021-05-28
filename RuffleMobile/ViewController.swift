@@ -8,50 +8,54 @@
 import UIKit
 import WebKit
 import GCDWebServer
+import MobileCoreServices
 
 class ViewController: UIViewController, UIDocumentPickerDelegate {
 
     @IBOutlet weak var webView: WKWebView!
     
     var httpServer: GCDWebServer!
+    var webDAVServer: GCDWebDAVServer!
+    
     let HTTP_PORT: UInt = 80
+    let SWF_NAME: String = "game.swf"
+    
+    let wwwSourcePath = "file://\(Bundle.main.path(forResource: "www", ofType: nil)!)"
+    let wwwDestinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("www")
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let webContentUrl = Bundle.main.path(forResource: "www", ofType: nil)!
+        let fileManager = FileManager.default
 
-        httpServer = GCDWebServer()
-        
-        httpServer.addGETHandler(forBasePath: "/", directoryPath: webContentUrl, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
-        
-        httpServer.addDefaultHandler(forMethod: "POST", request: GCDWebServerDataRequest.self) { request in
-            // get body of request somehow and store data in "www" directory
-            let dataRequest = request as! GCDWebServerDataRequest
-            print("Request received: \(String(decoding: dataRequest.data, as: UTF8.self))")
-            
-            // create file for request data
-            var documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            documentsPath.appendPathComponent("arbitrary.txt")
+        if !fileManager.fileExists(atPath: wwwDestinationUrl.path) {
+            do {
+                try fileManager.copyItem(at: URL(string: wwwSourcePath)!, to: wwwDestinationUrl)
+            } catch let error {
+                print("Could not copy directory despite it not existing at the destination path. Reason: \(error.localizedDescription)")
+            }
+        } else {
+            // Replace web content with a fresh copy. When updating the app, the data sticks around, so I'd need to replace the ruffle.js with a fresh nightly build for example.
+            do {
+                try fileManager.removeItem(at: wwwDestinationUrl)
+            } catch let error {
+                print("Could not remove item. Reason: \(error.localizedDescription)")
+            }
             
             do {
-                try dataRequest.data.write(to: documentsPath)
-                print(documentsPath)
+                try fileManager.copyItem(at: URL(string: wwwSourcePath)!, to: wwwDestinationUrl)
             } catch let error {
-                print(error.localizedDescription)
+                print("Could not copy items to destination path. Reason: \(error.localizedDescription)")
             }
-            
-            let items = try! FileManager.default.contentsOfDirectory(atPath: webContentUrl)
-            for item in items {
-                print(item)
-            }
-            
-            // attempt to request data from server
-            
-            return GCDWebServerResponse(statusCode: 200)
         }
+
+        httpServer = GCDWebServer()
+        webDAVServer = GCDWebDAVServer(uploadDirectory: wwwDestinationUrl.path)
+        
+        httpServer.addGETHandler(forBasePath: "/", directoryPath: wwwDestinationUrl.path, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
         
         httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
+        webDAVServer.start(withPort: 8080, bonjourName: nil)
         
         let request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/")!)
         webView.load(request)
@@ -60,32 +64,31 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         print("Picked documents at \(urls) from \(controller)")
         let importedFileUrl = urls.first!   // safe to force unwrap, VC doesn't allow multiple selection
+        let newFileUrl = wwwDestinationUrl.appendingPathComponent(SWF_NAME)
         
         do {
-            let data = try Data(contentsOf: importedFileUrl)
-
-            var request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/")!)
-            request.httpMethod = "POST"
-
-            let task = URLSession(configuration: .ephemeral).uploadTask(with: request, from: data) { data, response, error in
-                print("Data: \(String(describing: data))")
-                print("Response: \(String(describing: response))")
-                print("Error: \(String(describing: error))")
-                print(String(decoding: data!, as: UTF8.self))
+            let swfData = try Data(contentsOf: importedFileUrl)
+            
+            do {
+                try swfData.write(to: newFileUrl)
+                webView.reload()
+            } catch let error {
+                print("Could not write to \(SWF_NAME). Reason: \(error.localizedDescription)")
             }
-
-            task.resume()
-
         } catch let error {
-            createErrorAlert(message: error.localizedDescription)
+            print("Could not get data from SWF file. Reason: \(error.localizedDescription)")
         }
     }
     
     @IBAction func importButtonPressed(_ sender: Any) {
-        let dpvc = UIDocumentPickerViewController(documentTypes: ["public.text"], in: .import)
+        let dpvc = UIDocumentPickerViewController(documentTypes: ["com.makoren.ShockwaveFlash"], in: .import)
         dpvc.delegate = self
         dpvc.allowsMultipleSelection = false
         present(dpvc, animated: true, completion: nil)
+    }
+    
+    @IBAction func reloadButtonPressed(_ sender: Any) {
+        webView.reload()
     }
     
     func createErrorAlert(message: String) {
