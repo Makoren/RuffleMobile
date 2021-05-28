@@ -8,14 +8,12 @@
 import UIKit
 import WebKit
 import GCDWebServer
-import MobileCoreServices
 
 class ViewController: UIViewController, UIDocumentPickerDelegate {
 
     @IBOutlet weak var webView: WKWebView!
     
     var httpServer: GCDWebServer!
-    var webDAVServer: GCDWebDAVServer!
     
     let HTTP_PORT: UInt = 80
     let SWF_NAME: String = "game.swf"
@@ -32,33 +30,25 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
             do {
                 try fileManager.copyItem(at: URL(string: wwwSourcePath)!, to: wwwDestinationUrl)
             } catch let error {
-                print("Could not copy directory despite it not existing at the destination path. Reason: \(error.localizedDescription)")
-            }
-        } else {
-            // Replace web content with a fresh copy. When updating the app, the data sticks around, so I'd need to replace the ruffle.js with a fresh nightly build for example.
-            do {
-                try fileManager.removeItem(at: wwwDestinationUrl)
-            } catch let error {
-                print("Could not remove item. Reason: \(error.localizedDescription)")
-            }
-            
-            do {
-                try fileManager.copyItem(at: URL(string: wwwSourcePath)!, to: wwwDestinationUrl)
-            } catch let error {
-                print("Could not copy items to destination path. Reason: \(error.localizedDescription)")
+                print("Could not copy files to web server. Reason: \(error.localizedDescription)")
             }
         }
 
         httpServer = GCDWebServer()
-        webDAVServer = GCDWebDAVServer(uploadDirectory: wwwDestinationUrl.path)
+        httpServer.addGETHandler(forBasePath: "/", directoryPath: wwwDestinationUrl.path, indexFilename: "index.html", cacheAge: 0, allowRangeRequests: true)
         
-        httpServer.addGETHandler(forBasePath: "/", directoryPath: wwwDestinationUrl.path, indexFilename: "index.html", cacheAge: 3600, allowRangeRequests: true)
+        let options: [String: Any] = [
+            GCDWebServerOption_Port: HTTP_PORT,
+            //GCDWebServerOption_BindToLocalhost: true
+        ]
         
-        httpServer.start(withPort: HTTP_PORT, bonjourName: nil)
-        webDAVServer.start(withPort: 8080, bonjourName: nil)
+        do {
+            try httpServer.start(options: options)
+        } catch let error {
+            print("Could not start HTTP server. Reason: \(error.localizedDescription)")
+        }
         
-        let request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/")!)
-        webView.load(request)
+        loadWebContent(shouldReload: false, shouldClearCache: true)
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
@@ -71,7 +61,7 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
             
             do {
                 try swfData.write(to: newFileUrl)
-                webView.reload()
+                loadWebContent(shouldReload: true, shouldClearCache: true)
             } catch let error {
                 print("Could not write to \(SWF_NAME). Reason: \(error.localizedDescription)")
             }
@@ -88,12 +78,25 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     }
     
     @IBAction func reloadButtonPressed(_ sender: Any) {
-        webView.reload()
+        loadWebContent(shouldReload: true, shouldClearCache: true)
     }
     
     func createErrorAlert(message: String) {
         let ac = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(ac, animated: true, completion: nil)
+    }
+    
+    func loadWebContent(shouldReload: Bool, shouldClearCache: Bool) {
+        let websiteDataTypes = Set<String>(arrayLiteral: WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache)
+        let cacheDate = Date(timeIntervalSince1970: 0)
+        WKWebsiteDataStore.default().removeData(ofTypes: websiteDataTypes, modifiedSince: cacheDate, completionHandler: {})
+    
+        if shouldReload {
+            webView.reload()
+        } else {
+            let request = URLRequest(url: URL(string: "http://localhost:\(HTTP_PORT)/")!)
+            webView.load(request)
+        }
     }
 }
